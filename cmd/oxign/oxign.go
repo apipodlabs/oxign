@@ -1,10 +1,9 @@
 package main
 
 import (
-	"log"
-
+	"github.com/apipodlabs/oxign/internal/auth"
 	handler "github.com/apipodlabs/oxign/internal/handler"
-	"github.com/golang-migrate/migrate/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 
 	_ "github.com/golang-migrate/migrate/v4/database/cockroachdb"
@@ -13,18 +12,28 @@ import (
 )
 
 func main() {
-	m, err := migrate.New(
-		"file://db/migrations",
-		"cockroachdb://cockroach:@localhost:26257/example?sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := m.Up(); err != nil {
-		log.Fatal(err)
-	}
+	// m, err := migrate.New(
+	// 	"file://db/migrations",
+	// 	"cockroachdb://cockroach:@localhost:26257/example?sslmode=disable")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if err := m.Up(); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// TODO: create middleware for license auth
+	// TODO: selective path for JWT middleware to apply for several path only
+	// TODO: good-to-have create oauth2 and open id connect compliance API
 
 	app := echo.New()
 	app.GET("/", handler.HelloWorld)
+	app.GET("/login", auth.Authenticate)
+	app.GET("/verify", auth.JWTAuth)
+
+	app.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte("secret"),
+		Skipper:    auth.DefaultSkipper,
+	}))
 
 	app.Logger.Fatal(app.Start(":1323"))
 }
