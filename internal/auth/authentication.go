@@ -2,9 +2,7 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
-	"slices"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
@@ -24,13 +22,4 @@ func JWTAuth(c echo.Context) error {
 		return errors.New("failed to cast claims as jwt.MapClaims")
 	}
 	return c.JSON(http.StatusOK, claims)
-}
-
-func DefaultSkipper(context echo.Context) bool {
-	path := context.Path()
-	whitelist := []string{
-		"/login",
-	}
-	fmt.Printf("%s\n", path)
-	return slices.Contains(whitelist, path)
 }
