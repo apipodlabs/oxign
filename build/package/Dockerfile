@@ -12,7 +12,8 @@ RUN go mod download
 COPY . .
 
 # Build the Go application
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o artifacts .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o out cmd/oxign/oxign.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o out cmd/oxignd/oxignd.go
 
 # Stage 2: Final stage
 FROM alpine:3.21
@@ -21,10 +22,9 @@ FROM alpine:3.21
 WORKDIR /app
 
 # Copy the binary from the build stage
-COPY --from=build /app/myapp .
+COPY --from=build /app/out/ .
 
 # Set the timezone and install CA certificates
 RUN apk --no-cache add ca-certificates tzdata
 
-# Set the entrypoint command
-ENTRYPOINT ["/app/myapp"]
+CMD [ "oxign" ]

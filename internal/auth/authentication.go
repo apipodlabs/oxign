@@ -8,10 +8,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Authenticate(context echo.Context) error {
-	return context.String(http.StatusOK, "Hello, World!\n")
-}
-
 func JWTAuth(c echo.Context) error {
 	token, ok := c.Get("user").(*jwt.Token) // by default token is stored under `user` key
 	if !ok {

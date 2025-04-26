@@ -1,12 +1,9 @@
-.PHONY: all docs build
+.PHONY: all docs build api worker
 
-docs:
-	swag init -g cmd/oxign/oxign.go --output api/oxign
-
-run_api:
+api:
 	go run cmd/oxign/oxign.go
 
-run_worker:
+worker:
 	go run cmd/oxign/oxignd.go
 
 build:
