@@ -4,7 +4,6 @@ import (
 	"github.com/apipodlabs/oxign/internal/auth"
 	handler "github.com/apipodlabs/oxign/internal/handler"
 	"github.com/apipodlabs/oxign/internal/health"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 
 	_ "github.com/golang-migrate/migrate/v4/database/cockroachdb"
@@ -27,13 +26,11 @@ func main() {
 	// TODO: good-to-have create oauth2 and open id connect compliance API
 
 	app := echo.New()
-	jwtAuthMiddleware := echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte("secret"),
-	})
 
 	app.GET("/", handler.HelloWorld)
 	app.GET("/health", health.HealthCheck)
-	app.POST("/login", auth.JWTAuth, jwtAuthMiddleware)
+	app.POST("/login", handler.HelloWorld)
+	app.GET("/me", handler.HelloWorld, auth.AuthMiddleware)
 
 	app.Logger.Fatal(app.Start("localhost:8888"))
 }

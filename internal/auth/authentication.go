@@ -1,21 +1,28 @@
 package auth
 
 import (
-	"errors"
-	"net/http"
+	"fmt"
+	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
-func JWTAuth(c echo.Context) error {
-	token, ok := c.Get("user").(*jwt.Token) // by default token is stored under `user` key
-	if !ok {
-		return errors.New("JWT token missing or invalid")
+func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		fmt.Println("TEST")
+		authHeader := c.Request().Header.Get("Authorization")
+		if authHeader != "" {
+			const prefixBearer = "Bearer "
+			const prefixLicense = "License "
+
+			if strings.HasPrefix(authHeader, prefixBearer) {
+				token := strings.TrimPrefix(authHeader, prefixBearer)
+				fmt.Println("Token:", token)
+			} else if strings.HasPrefix(authHeader, prefixLicense) {
+				token := strings.TrimPrefix(authHeader, prefixLicense)
+				fmt.Println("Token:", token)
+			}
+		}
+		return next(c)
 	}
-	claims, ok := token.Claims.(jwt.MapClaims) // by default claims is of type `jwt.MapClaims`
-	if !ok {
-		return errors.New("failed to cast claims as jwt.MapClaims")
-	}
-	return c.JSON(http.StatusOK, claims)
 }
